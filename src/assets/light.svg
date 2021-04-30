@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="29.499" height="29.5" viewBox="0 0 29.499 29.5">
+  <g id="Group_3947" data-name="Group 3947" transform="translate(-967 -25)">
+    <path id="Icon_awesome-sun" data-name="Icon awesome-sun" d="M28.947,13.857l-5.456-2.725,1.93-5.785a1,1,0,0,0-1.262-1.262l-5.785,1.93L15.643.553a1,1,0,0,0-1.786,0L11.132,6.009,5.341,4.079A1,1,0,0,0,4.079,5.341l1.93,5.785L.553,13.857a1,1,0,0,0,0,1.786l5.456,2.725-1.93,5.791a1,1,0,0,0,1.262,1.262l5.785-1.93,2.725,5.456a1,1,0,0,0,1.786,0l2.725-5.456,5.785,1.93a1,1,0,0,0,1.262-1.262l-1.93-5.785,5.456-2.725a1,1,0,0,0,.012-1.792Zm-8.983,6.107a7.374,7.374,0,1,1,0-10.429A7.383,7.383,0,0,1,19.964,19.964Z" transform="translate(967 25)" fill="#fff"/>
+    <g id="Ellipse_21" data-name="Ellipse 21" transform="translate(974 32)" fill="#fff" stroke="#25224e" stroke-width="2">
+      <circle cx="8" cy="8" r="8" stroke="none"/>
+      <circle cx="8" cy="8" r="7" fill="none"/>
+    </g>
+  </g>
+</svg>

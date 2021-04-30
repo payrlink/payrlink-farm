@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="49" height="49" viewBox="0 0 49 49">
+  <g id="Group_4412" data-name="Group 4412" transform="translate(-876 -273)">
+    <circle id="Ellipse_11" data-name="Ellipse 11" cx="24.5" cy="24.5" r="24.5" transform="translate(876 273)" fill="#868dac"/>
+    <path id="Icon_simple-ethereum" data-name="Icon simple-ethereum" d="M15.329,20.642l-8.459-5,8.458,11.923,8.466-11.923-8.468,5h0ZM15.458,0,7,14.04l8.46,5,8.46-5Z" transform="translate(885.13 284)" fill="#fff"/>
+    <path id="Path_2875" data-name="Path 2875" d="M24.5,0A24.5,24.5,0,1,1,0,24.5,24.5,24.5,0,0,1,24.5,0Z" transform="translate(876 273)" fill="#f2a919"/>
+    <text id="D" transform="translate(891.251 305.9)" fill="#fff" font-size="25" font-family="SegoeUI-Bold, Segoe UI" font-weight="700"><tspan x="0" y="0">D</tspan></text>
+    <line id="Line_2" data-name="Line 2" x2="22.301" transform="translate(890 296.05)" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="1"/>
+    <line id="Line_3" data-name="Line 3" x2="22.301" transform="translate(890 300.95)" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="1"/>
+  </g>
+</svg>
