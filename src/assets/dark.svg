@@ -1,0 +1,32 @@
+<svg id="Component_36_1" data-name="Component 36 – 1" xmlns="http://www.w3.org/2000/svg" width="29.499" height="29.5" viewBox="0 0 29.499 29.5">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        stroke: #25224e;
+        stroke-width: 2px;
+      }
+
+      .cls-3 {
+        fill: #25224e;
+      }
+
+      .cls-4 {
+        stroke: none;
+      }
+
+      .cls-5 {
+        fill: none;
+      }
+    </style>
+  </defs>
+  <path id="Icon_awesome-sun" data-name="Icon awesome-sun" class="cls-1" d="M28.947,13.857l-5.456-2.725,1.93-5.785a1,1,0,0,0-1.262-1.262l-5.785,1.93L15.643.553a1,1,0,0,0-1.786,0L11.132,6.009,5.341,4.079A1,1,0,0,0,4.079,5.341l1.93,5.785L.553,13.857a1,1,0,0,0,0,1.786l5.456,2.725-1.93,5.791a1,1,0,0,0,1.262,1.262l5.785-1.93,2.725,5.456a1,1,0,0,0,1.786,0l2.725-5.456,5.785,1.93a1,1,0,0,0,1.262-1.262l-1.93-5.785,5.456-2.725a1,1,0,0,0,.012-1.792Zm-8.983,6.107a7.374,7.374,0,1,1,0-10.429A7.383,7.383,0,0,1,19.964,19.964Z"/>
+  <g id="Ellipse_21" data-name="Ellipse 21" class="cls-2" transform="translate(7 7)">
+    <circle class="cls-4" cx="8" cy="8" r="8"/>
+    <circle class="cls-5" cx="8" cy="8" r="7"/>
+  </g>
+  <path id="Path_2808" data-name="Path 2808" class="cls-3" d="M982,32.971V47.046l4.82-1.695,1.916-3.685V37.908l-1.179-2.285-2.579-1.989Z" transform="translate(-967 -25)"/>
+</svg>

@@ -1,0 +1,477 @@
+h1{
+    font-size: 2.3rem;
+    @media (max-width: 1200px) {  
+        font-size: 1.8rem;
+    }
+}
+
+.main_layout {
+    background-color: #141132;
+    min-height: 100vh;
+}
+
+.header {
+    background-color: #25224e;
+}
+
+.text_white {
+    color: white;
+    &:hover {
+    color: white !important;
+    }
+}
+
+.btn_white {
+    color: #141132;
+    background-color: white;
+    border-radius: 7px;
+    font-weight: 700;
+}
+
+.app_secondery {
+    background-color: #211d40;
+}
+
+.line_side {
+    border-right: 5px solid #565bb5;
+    @media (max-width: 768px) {  
+        border-right: none;
+    }
+}
+
+.icon_round {
+    position: absolute;
+    background-color: #141132;
+    border: 10px solid #211D40;
+    display: flex;
+    width: 150px;
+    height: 150px;
+    top: 50%;
+    right: 0%;
+    border-radius: 200px;
+    transform: translate(-35%, -50%);
+    @media (max-width: 1600px) { 
+        width: 130px;
+    height: 130px;
+}
+}
+
+.feature_img {
+        max-width: 90%;
+        padding-right: 4em;
+}
+
+.roadmap_card {
+    background-color: #141132;
+    border-radius: 25px;
+    min-height: 250px;
+        
+}
+
+.icon_right, .icon_left {
+    .icon_round {
+        position: absolute;
+        background-color: #141132;
+        border: 10px solid #211D40;
+        display: flex;
+        width: 150px;
+        height: 150px;
+        top: 50%;
+        left: -5%;
+        border-radius: 200px;
+        transform: translate(-50%, -50%);
+    }
+    .icon_line {
+        width: 30%;
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translate(-50%, -50%);
+    }
+}
+
+
+.icon_round_left {
+    position: absolute;
+    background-color: #141132;
+    border: 10px solid #211D40;
+    display: flex;
+    width: 150px;
+    height: 150px;
+    top: 50%;
+    right: 0;
+    border-radius: 200px;
+    transform: translate(60%, -50%);
+}
+
+.icon_top {
+    .icon_round {
+        position: absolute;
+        background-color: #141132;
+        border: 10px solid #211D40;
+        display: flex;
+        width: 150px;
+        height: 150px;
+        top: 0;
+        left: 50%;
+        right: 50%;
+        border-radius: 200px;
+
+     
+        transform: translate(-50%, -50%);
+    }
+    
+}
+
+.icon_line {
+    width: 30%;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate(-55%, -50%);
+}
+
+.icon_line_roadmap {
+    width: 30%;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate(-50%, -50%);
+}
+
+.marquee_class {
+    background-color: #0b0920;
+    color: white;
+    font-weight: 600;
+    font-size: 1.5em;
+}
+
+.card_div {
+    background-color: #141132;
+    padding: 2.5em;
+    border-radius: 25px;
+}
+
+.icon_over {
+    background-color: #25224e;
+    height: 40px;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 30px;
+}
+
+.intro_section {
+    min-height: 80vh;
+}
+
+.adviser_section {
+    background-color: #141132;
+    border-radius: 25px;
+    min-height: 200px;
+    // padding: 3em;
+
+    .adviser_card {
+        background-color: #25224e;
+        padding: 2.5em;
+        border-radius: 25px;
+    }
+}
+
+.chart_sec {
+    background-color: #25224e;
+    border-radius: 25px;
+}
+
+.chart_container {
+    min-height: 50%;
+    min-width: 50%;
+    max-height: 100%;
+    max-width: 70%;
+
+    @media (max-width: 767px) {  
+    min-height: 200px;
+    min-width: 200px;
+}}
+
+.tokenomics_side {
+   
+    .chart_sec {
+        background-color: #25224e;
+        border-radius: 25px;
+        
+        .round_div {
+            height: 170px;
+            width: 170px;
+            border-radius: 100px;
+            border: 8px solid rgba(255, 255, 255, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .price_tag {
+            background-color: white;
+            color: #141132;
+            border-radius: 15px;
+            font-size: 1em;
+            font-weight: bold;
+        }
+    }
+    .lable_top {
+        h3 {
+            background-color: #141132;
+            min-width: 200px;
+        }
+    }
+}
+
+.contact_us_light {
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 15px;
+}
+
+.contact_us_dark {
+    background-color: #1b1941;
+    border-radius: 15px;
+}
+
+.submit_footer{ 
+    background-color: #141132;
+    color: white;
+    border: none;
+}
+
+.year_switch {
+    background-color: #141132;
+    border-radius: 50px;
+    
+}
+
+.feature_card {
+    width: 75%;
+    @media (max-width: 992px) {  
+        width: 100%;
+    }
+}
+
+.pre_block {
+    .app_secondery {
+        padding-bottom: 200px;
+        border-radius: 0 0 15px 15px;
+        @media (max-width: 768px) {  
+            padding-bottom: 100px;
+    }
+    }
+}
+
+.counter_block {
+    height: 0;
+    color: #141132;
+    width: fit-content;
+    .counter_white {
+        border-radius: 20px;
+        .text_large {
+            font-size: 4.5rem;
+        @media (max-width: 768px) {  
+            font-size: 1.5rem;
+    }
+        }
+    }
+    transform: translate(-0%, -230px);
+    @media (max-width: 767.98px) {      
+        transform: translate(-0%, -150px);
+    }
+}
+
+.border_radius {
+    border-radius: 15px;   
+}
+
+.bg_gray {
+    background-color: #3D3B51;
+}
+
+.w-fill-available {
+    width: -webkit-fill-available;
+}
+
+.w-fit-content {
+    width: fit-content;
+}
+
+
+
+.modal-90w {
+    width: 90%;
+}
+
+.theme_light {
+    background-color: #EFEFEF;
+    color: #4B4B4B;
+    .card_sec {
+        background-color: white;
+    }
+    .farm_card {
+        .bg_app_dark {
+            background-color: #1E1B40;
+        }
+        .app_border {
+            border: 2px solid #1E1B40;
+            color: #1E1B40;        
+            background-color: transparent;
+        }
+    
+        .bg_harvest {
+            background-color: #E9E9E9;
+        }
+        .text_app {
+            color: #1E1B40;
+        }
+        
+    }
+    
+}
+
+
+.theme_dark {
+    background-color: #1D1D1D;
+    color: white;
+    .card_sec {
+        background-color: #484848;
+    }
+    .farm_card {
+        .bg_app_dark {
+            background-color: #403894;
+        }
+        .app_border {
+            border: 2px solid white;
+            color: white;
+            background-color: transparent;
+        }
+    
+        .bg_harvest {
+            background-color: #333333;
+        }
+        .text_app {
+            color: white;
+        }
+        .deposit_card {
+            background-image: url(../assets/card-bg.png);
+        }
+    }
+    .submit_footer_darh{ 
+        background-color: #403894;
+        color: white;
+        border: none;
+    }
+}
+
+.custom_imput {
+    border: 2px solid #141132;
+    border-radius: 7px;
+    background-color: transparent !important;
+    
+}
+
+.bg_transprent {
+    background-color: transparent;
+}
+
+.custome_normal_modal_light {
+        .modal-header {
+            background-color: #25224E;
+            border-radius: 13px 13px 0 0 ;
+            button {
+                color: white;
+            }
+        }
+        .modal-content {
+            border-radius: 15px;
+            button {
+            color: #707070;
+            }
+        }
+        .deposit_card {
+            background-image: url("../assets/card-bg.png");
+            background-color: #25224E;
+            background-position: right;
+            background-size: contain;
+            background-repeat: no-repeat;
+            border-radius: 15px;
+            color: white;
+            min-height: 150px;
+            .text_app {
+                color: #1E1B40;
+            }   
+        }
+        
+    .app_border {
+        border: 2px solid #1E1B40;
+        color: #1E1B40;        
+        background-color: transparent;
+    }
+
+    .bg_app_dark {
+        background-color: #25224E;
+    }
+    }
+
+    .custome_normal_modal_dark {
+        color: white;
+        .modal-header {
+            background-color: #403894;
+            border-radius: 13px 13px 0 0 ;
+            button {
+                color: white;
+            }
+        }
+        .modal-content {
+            background-color: #1F1F1F;
+            // background-color: #333333;
+            border-radius: 15px;
+            button {
+            color: #707070;
+            }
+        }
+        .deposit_card {
+            background-image: url("../assets/card-bg.png");
+            background-color: #25224E;
+            background-position: right;
+            background-size: contain;
+            background-repeat: no-repeat;
+            border-radius: 15px;
+            color: white;
+            min-height: 150px;
+            .text_app {
+                color: #1E1B40;
+            }   
+        }
+        .app_border {
+            border: 2px solid white;
+            color: white;        
+            background-color: transparent;
+        }
+    
+        .bg_app_dark {
+            background-color: #25224E;
+        }
+        .h_title {
+            color: white;
+        }
+
+        .bg_harvest {
+            background-color: #333333;
+        
+        }
+        .text_app {
+            color: white;
+        }
+        .custom_imput {
+            border: 2px solid #403894;
+            border-radius: 7px;
+            background-color: transparent !important;
+            color: white;   
+        }
+    }    
