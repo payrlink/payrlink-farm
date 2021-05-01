@@ -7,14 +7,15 @@ import Telegram from "../assets/telegram.svg";
 import Youtube from "../assets/youtube.svg";
 import Logo from "../assets/footer_logo.png";
 
-const footer = () => {
+const Footer = (props) => {
     return (
         <>
-        <Row className="p-3 p-md-5 justify-content-center">
+        <Row className="p-3 p-md-5 justify-content-center app_secondery">
             <Col xl="3" className="mb-5 mr-xl-5 feature_card">
-                <div className="contact_us text-white px-3 py-4">
+                <div className={`contact_us_${props.themeClass ? 'light' : 'dark'} text-white px-3 py-4`}>
                     <h4>Contact Us</h4>
                 <Form>
+                {/* ${props.themeClass} */}
                     <Form.Group >
                         <Form.Control type="text" className="mb-3" />
                         <Form.Control type="text" className="mb-3" />
@@ -30,9 +31,9 @@ const footer = () => {
                 <div className="d-flex justify-content-center">
                     <div className="pr-4 d-flex flex-column h-auto">
                         <div>
-                            <h4 className="mb-3"><a className="text-white font-weight-light" href="#">WHITEPAPER</a></h4>
-                            <h4 className="mb-3"><a className="text-white font-weight-light" href="#">VIDEO</a></h4>
-                            <h4 className="mb-3"><a className="text-white font-weight-light" href="#">ARTICLES</a></h4>
+                            <h5 className="mb-3"><a className="text-white font-weight-light" href="#">WHITEPAPER</a></h5>
+                            <h5 className="mb-3"><a className="text-white font-weight-light" href="#">VIDEO</a></h5>
+                            <h5 className="mb-3"><a className="text-white font-weight-light" href="#">ARTICLES</a></h5>
                         </div>
                         <div className="d-flex mt-auto">
                             <a href="#"><img src={Twitter} className="mr-2" /></a>
@@ -43,10 +44,10 @@ const footer = () => {
                         </div>
                     </div>
                     <div className="pl-4 border-left">
-                        <h4 className="mb-3"><a className="text-white font-weight-light" href="#">ESCROW SERVICE</a></h4>
-                        <h4 className="mb-3"><a className="text-white font-weight-light" href="#">ARBITRATION CENTER</a></h4>
-                        <h4 className="mb-3"><a className="text-white font-weight-light" href="#">FARM</a></h4>
-                        <h4 className="mb-3"><a className="text-white font-weight-light" href="#">BUY TOKENS</a></h4>
+                        <h5 className="mb-3"><a className="text-white font-weight-light" href="#">ESCROW SERVICE</a></h5>
+                        <h5 className="mb-3"><a className="text-white font-weight-light" href="#">ARBITRATION CENTER</a></h5>
+                        <h5 className="mb-3"><a className="text-white font-weight-light" href="#">FARM</a></h5>
+                        <h5 className="mb-3"><a className="text-white font-weight-light" href="#">BUY TOKENS</a></h5>
                         
                     </div>
                 </div>
@@ -58,7 +59,7 @@ const footer = () => {
             
         </Row>
         <Row>
-            <Col xl="12" className="text-white pt-5 text-center">
+            <Col xl="12" className="text-white pt-5 text-center app_secondery">
                 <p>Copyright © 2021 designed by Sunil  |  AJ  All rights reserved.</p>
             </Col>
         </Row>
@@ -66,4 +67,4 @@ const footer = () => {
     );
 }
 
-export default footer;
+export default Footer;
