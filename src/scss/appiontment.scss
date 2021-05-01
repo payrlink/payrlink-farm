@@ -1,0 +1,76 @@
+.radio_timezone {
+  .btn_wrapper {
+    padding: 10px 0;
+    margin-left: 15px;
+    border-bottom: #0000004d solid 1.3px;
+
+    .ant-radio-button-wrapper {
+      margin: 5px 10px 5px 0;
+      padding: 5px 1.5em;
+      height: auto;
+      border-radius: 2px;
+      min-width: 110px;
+      text-align: center;
+
+      &.ant-radio-button-wrapper-checked {
+        background-color: #f0f2f5;
+      }
+    }
+  }
+  .radio_timezone_body {
+    max-height: 350px;
+    overflow: auto;
+    @media (min-width: 1200px) {
+      max-height: 400px;
+    }
+  }
+
+  .radio_timezone_footer {
+    padding-top: 1.5em;
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+    border-top: #0000004d solid 1.3px;
+  }
+
+  .btn_scroll_wrapper {
+    display: flex;
+    overflow: auto;
+    .ant-radio-button-wrapper {
+      margin: 5px 10px 5px 0;
+
+      padding: 5px 2em;
+      height: auto;
+      border-radius: 2px;
+      min-width: 130px;
+      text-align: center;
+
+      &.ant-radio-button-wrapper-checked {
+        background-color: #f0f2f5;
+      }
+    }
+  }
+  .time_wrapper {
+    border-right: #0000004d solid 1.3px;
+    padding-top: 12px;
+  }
+}
+
+@media (max-width: "991.98px") {
+  .radio_timezone {
+    .ant-radio-button-wrapper {
+      margin: 5px;
+      padding: 0.2em 0.5em;
+      min-width: 90px;
+    }
+    .btn_wrapper {
+      padding: 10px 0;
+      margin-left: 0;
+      // border-bottom: #0000004d solid 1.3px;
+      text-align: center;
+    }
+    .time_wrapper {
+      border-right: none;
+    }
+  }
+}

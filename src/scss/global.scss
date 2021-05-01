@@ -1,0 +1,172 @@
+@import "./variable.scss";
+
+* {
+  font-family: "Work Sans", sans-serif;
+}
+
+body {
+  @media (min-width: 1600px) {
+    font-size: 16px !important;
+  }
+}
+.container_padding {
+  padding-top: 20px;
+  padding-bottom: 100px;
+}
+
+.field_custome_hight {
+  height: 34px;
+  .ant-select-selection--single {
+    height: 34px;
+  }
+  @media (min-width: 1600px) {
+    height: 40px;
+    margin: 0.5em 0;
+    .ant-select-selection--single {
+      height: 40px;
+      margin: 0.5em 0;
+    }
+  }
+}
+
+.custom_line {
+  display: block;
+  height: 1px;
+  border: 0;
+  margin-left: 0;
+  padding: 0;
+  &.gray {
+    border-top: 3px solid gray;
+  }
+  &.green {
+    border-top: 3px solid $green;
+  }
+  &.red {
+    border-top: 3px solid $red;
+  }
+  &.short {
+    width: 3.5rem;
+  }
+  &.medium {
+    width: 6rem;
+  }
+  &.long {
+    width: 8rem;
+  }
+}
+
+.link_button {
+  border-radius: 2px;
+  color: white;
+  width: 120px;
+}
+
+.custom_secondary_btn {
+  color: #595959;
+  border: 1px solid #f5f5f5;
+  background-color: #f5f5f5;
+  &:hover {
+    background-color: #e8e8e8;
+  }
+}
+
+.login_form {
+  .custome_icon_class {
+    .ant-input-affix-wrapper .ant-input:not(:first-child) {
+      padding-left: 35px;
+    }
+  }
+  .ant-input-affix-wrapper .ant-input-prefix {
+    left: 8px;
+  }
+}
+
+.footer_class {
+  .footer_element {
+    margin-right: 25px;
+  }
+  @media (max-width: 998.98px) {
+    justify-content: center;
+    .footer_element {
+      margin: 0 12px;
+    }
+  }
+}
+
+.footer_copyright {
+  text-align: right;
+}
+
+.custom_header_color {
+  .ant-modal-title,
+  .ant-modal-confirm-body .ant-modal-confirm-title {
+    color: $app_text_color;
+  }
+}
+
+.ant-col-24.ant-form-item-label {
+  padding: 0 !important;
+}
+
+.min-height-cal {
+  min-height: calc(100vh - 155px);
+}
+
+.min-height-cal-regular {
+  min-height: calc(100vh - 140px);
+}
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+.mb-0 {
+  margin-bottom: 0px;
+}
+.text-capitalize {
+  text-transform: capitalize;
+}
+.bg-white {
+  background-color: white;
+  color: $app_color_light;
+  border: 1px solid $app_color_light;
+}
+.bg-blue,
+.bg-white {
+  width: 160px;
+  padding: 9px 0;
+  height: auto;
+}
+
+.map-background {
+  min-height: 550px;
+  background: transparent url("../../src/assets/images/Contact-Header.png");
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-position: center;
+}
+.contact_info_class {
+  display: flex;
+  justify-content: center;
+  @media (max-width: 998.98px) {
+    justify-content: start;
+  }
+}
+.side_divider {
+  border-right: 1px solid $gray-2;
+  border-left: 1px solid $gray-2;
+  @media (max-width: 998.98px) {
+    border: none;
+  }
+}
+
+
+.google_login_button {
+  span {
+    display: flex;
+    align-items: center;
+    padding: 0 10px 0 0 !important;
+  }
+
+.roboto_text {
+  font-family: "Roboto", sans-serif;
+}
+}
