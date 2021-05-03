@@ -1,10 +1,8 @@
-import '../scss/App.scss';
+import "../scss/App.scss";
 import Route from "../route/index";
 
 function App() {
-  return (
-      <Route />
-      );
+  return <Route />;
 }
 
 export default App;
