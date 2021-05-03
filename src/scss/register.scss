@@ -1,0 +1,110 @@
+@import "variable";
+
+.custom_stepper_bar {
+  .ant-steps-item-title {
+    font-size: 14px;
+    //text-wrap: unset;
+    white-space: nowrap;
+  }
+  .ant-steps-item-process
+    > .ant-steps-item-container
+    > .ant-steps-item-content
+    > .ant-steps-item-title {
+    color: $app_color_light;
+  }
+  .ant-steps-dot .ant-steps-item-tail::after,
+  .ant-steps-dot.ant-steps-small .ant-steps-item-tail::after {
+    height: 2px;
+  }
+
+  .ant-steps-item-process
+    .ant-steps-item-icon
+    > .ant-steps-icon
+    .ant-steps-icon-dot {
+    border: 2px solid $app_color_light;
+    background: transparent;
+    width: 120%;
+    height: 120%;
+  }
+  .ant-steps {
+    @media (max-width: 991.98px) {
+      display: none;
+    }
+  }
+}
+.register_stepper_form {
+  margin-top: 2em;
+  padding: 1.5em 3em;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+
+  .ant-form-item-label {
+    line-height: inherit;
+  }
+
+  .ant-form-item {
+    margin-bottom: 16px;
+  }
+
+  .custom_slider {
+    h4 {
+      line-height: 20px;
+      margin-bottom: 0;
+    }
+
+    .ant-slider-track {
+      background-color: $app_color_light !important;
+    }
+
+    .ant-slider:hover .ant-slider-handle:not(.ant-tooltip-open),
+    .ant-slider-handle.ant-tooltip-open {
+      border-color: #096dd9;
+    }
+
+    .ant-slider-handle {
+      border-color: $app_color_light;
+    }
+  }
+
+  .parent_question {
+    .sub_question {
+      &:first-child {
+        margin-top: 2em;
+      }
+      margin-left: 1.5em;
+      margin-bottom: 0em;
+    }
+  }
+}
+
+.info_modal {
+  .ant-modal-confirm-content {
+    margin-left: 0px !important;
+  }
+  .ant-modal-confirm-btns {
+    width: 100%;
+    margin-top: 0;
+    button {
+      width: 100% !important;
+    }
+  }
+}
+
+.info_modal_normal {
+  .ant-modal-confirm-content {
+    margin-left: 0px !important;
+  }
+  .ant-modal-confirm-btns {
+    margin-top: 0;
+    button {
+      padding: 8px 15px;
+      min-width: 70px;
+      height: auto;
+      border-radius: 3px;
+    }
+  }
+}
+
+.ant-modal-confirm .ant-modal-body {
+  padding: 24px;
+}

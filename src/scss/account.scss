@@ -1,0 +1,72 @@
+.view-profile, .edit-profile{
+    .ant-collapse{
+        background-color: white;
+        margin: 0 0 20px;
+    }
+    .ant-collapse-header{
+        background-color: white;
+        line-height: 30px!important;
+        color: $app_color_light!important;
+        font-size: 18px;
+        padding: 12px 40px!important;
+        i.ant-collapse-arrow{
+            right: 16px;
+            left: auto!important;
+            color: $gray-3!important;
+            font-size: 16px!important;
+        }
+    }
+    .ant-collapse-content{
+        border-top: 0px;
+        .ant-collapse-content-box{
+            // padding-top: 0px;
+            padding: 10px 40px;
+        }
+    }    
+}
+.edit-profile {
+    .ant-form-item{
+        margin-bottom: 5px;
+    }
+    .ant-form-item-label {
+        label::after{
+            content: '' ;
+        }
+    } 
+    .progress{
+        .ant-form-item-control{
+            line-height: 0px;
+        }
+    }
+    .fillform{
+        @media screen and (max-width: 767px) {
+            display: block!important;
+        }
+        p{
+            @media screen and (max-width: 767px) {
+                margin-bottom: 15px!important;
+            }
+        }
+    }
+    .right-spacing{
+        .ant-form-item label {
+            margin-right: 30px;
+            margin-bottom: 15px;
+        }
+    }
+    
+}
+.change-password{
+    .ant-form-item{
+        margin-bottom: 0px;
+        button{
+            border-radius: 3px;
+            height: 38px;
+            margin-top: 16px;
+            float: right;
+        }
+    }    
+    .ant-modal-footer{
+        display: none;        
+    } 
+}   
