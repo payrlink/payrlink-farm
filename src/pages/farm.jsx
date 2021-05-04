@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Container, Row, Col, Button, Dropdown } from "react-bootstrap";
+
+import { useWallet } from 'use-wallet';
+
 import Logo from "../assets/logo.png";
 import Footer from "../components/footer";
 import Wallet from "../assets/walletSmall.svg";
@@ -10,22 +13,64 @@ import Dark from "../assets/dark.svg";
 
 const Farm = () => {
   const [modalShow, setModalShow] = useState(false);
-  const [connectedWallet, setConnectedWallet] = useState(null);
   const [theme, setTheme] = useState(true);
+  const [userAccount, setUserAccount] = useState(null);
 
-  function onChangeWallet(data) {
-    setConnectedWallet(data);
-    setModalShow(false);
+  const { account, connect, reset, status } = useWallet();
+
+  useEffect(() => {
+    const localAccount = localStorage.getItem("account");
+    const walletProvider = localStorage.getItem("walletProvider");
+    if (!account && localAccount) {
+      setUserAccount(localAccount);
+      if (localAccount && (walletProvider === "metamask" || walletProvider === "injected")) {
+        connect("injected");
+        localStorage.setItem("walletProvider", "metamask");
+      }
+      if (localAccount && walletProvider === "walletconnect") {
+        connect('walletconnect');
+        localStorage.setItem("walletProvider", "walletconnect");
+      }
+    }
+  }, []);
+
+  const onChangeWallet = (data) => {
+    if (data === 'metamask') {
+      connect("injected");
+      localStorage.setItem("walletProvider", "metamask");
+      setModalShow(false);
+    } else if (data === 'walletconnect') {
+      connect("walletconnect");
+      localStorage.setItem("walletProvider", "walletconnect");
+      setModalShow(false);
+    }
   }
 
-  function onDisconnectWallet() {
-    setConnectedWallet(null);
-    setModalShow(false);
+  useEffect(() => {
+    if (account) {
+      setUserAccount(account);
+      localStorage.setItem("account", account);
+    }
+  }, [account]);
+
+  const onDisconnectWallet = () => {
+    reset();
+    setUserAccount(null);
+    localStorage.removeItem("account");
+    localStorage.removeItem("walletProvider");
   }
 
-  function changeTheme() {
+  const changeTheme = () => {
     setTheme(!theme);
   }
+
+  // useEffect(() => {
+  //   if (status === "disconnected") {
+  //     setUserAccount(null);
+  //     localStorage.removeItem("account");
+  //     localStorage.removeItem("walletProvider");
+  //   }
+  // }, [status]);
 
   return (
     <Container fluid className="main_layout">
@@ -40,9 +85,9 @@ const Farm = () => {
           </div>
           <div className="d-flex align-items-center">
             <Button variant="link" onClick={() => changeTheme()}>
-              <img src={theme ? Light : Dark} />
+              <img alt="theme" src={theme ? Light : Dark} />
             </Button>
-            {connectedWallet === null ? (
+            {!userAccount ? (
               <Button
                 variant="light"
                 className="btn_white mx-md-3 h-100"
@@ -57,8 +102,8 @@ const Farm = () => {
                   className="btn_white"
                   id="dropdown-basic"
                 >
-                  <img src={Wallet} className="mr-1" />
-                  0X13484****79
+                  <img alt="address" src={Wallet} className="mr-1" />
+                  {userAccount.slice(0, 10)}...
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>
@@ -89,7 +134,7 @@ const Farm = () => {
             <FarmCard
               themeClass={theme}
               onChangeWallet={onChangeWallet}
-              connectedWallet={connectedWallet}
+              account={userAccount}
             />
           </Row>
         </Col>
