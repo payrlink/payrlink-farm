@@ -131,13 +131,20 @@ const Farm = () => {
         <Col xl="10" className="">
           <h2 className="font-weight-bold">Stake LP tokens to earn PAYR</h2>
           <h5>Deposit Fee will be used to buyback PAYR</h5>
-          <Row className="my-4 justify-content-center justify-content-lg-start">
-            <FarmCard
-              themeClass={theme}
-              onChangeWallet={onChangeWallet}
-              account={userAccount}
-            />
-          </Row>
+          {userAccount ? (
+            <Row className="my-4 justify-content-center justify-content-lg-start">
+              <FarmCard
+                themeClass={theme}
+                onChangeWallet={onChangeWallet}
+                account={userAccount}
+              />
+            </Row>
+          ) : (
+            <Row className="my-4 justify-content-center justify-content-lg-center align-items-center w-100 p-3">
+              <h2 className="font-weight-bold text-align-center my-3">Connect Your Wallet!</h2>
+            </Row>
+          )}
+          
         </Col>
       </Row>
       <Footer themeClass={theme} />

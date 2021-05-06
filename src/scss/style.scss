@@ -351,6 +351,9 @@ h1 {
     .deposit_card {
       background-image: url(../assets/card-bg.png);
     }
+    .harvest_card {
+      background-image: url(../assets/card-bg.png);
+    }
   }
   .submit_footer_darh {
     background-color: #403894;
@@ -397,6 +400,20 @@ h1 {
     }
   }
 
+  .harvest_card {
+    background-image: url("../assets/card-bg.png");
+    background-color: #25224e;
+    background-position: right;
+    background-size: contain;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+    color: white;
+    min-height: 60px;
+    .text_app {
+      color: #1e1b40;
+    }
+  }
+
   .app_border {
     border: 2px solid #1e1b40;
     color: #1e1b40;
@@ -434,6 +451,19 @@ h1 {
     border-radius: 15px;
     color: white;
     min-height: 150px;
+    .text_app {
+      color: #1e1b40;
+    }
+  }
+  .harvest_card {
+    background-image: url("../assets/card-bg.png");
+    background-color: #25224e;
+    background-position: right;
+    background-size: contain;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+    color: white;
+    min-height: 60px;
     .text_app {
       color: #1e1b40;
     }
