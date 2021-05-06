@@ -31,6 +31,7 @@ function ConectWallet(props) {
       <Modal.Body className="px-4">
         <div className="d-flex">
           <img
+            alt="warning"
             src={props.themeClass ? ExcMark : ExcMarkWhite}
             className="mr-3"
           />
@@ -44,7 +45,7 @@ function ConectWallet(props) {
             variant="light"
             className="mx-md-3 shadow d-flex align-items-center w-fill-available my-3 bg_harvest border-0"
             onClick={() => {
-              props.onChangeWallet(1);
+              props.onChangeWallet('metamask');
               props.onHide();
             }}
           >
@@ -55,7 +56,7 @@ function ConectWallet(props) {
             variant="light"
             className="mx-md-3 shadow d-flex align-items-center w-fill-available mb-5 bg_harvest border-0"
             onClick={() => {
-              props.onChangeWallet(2);
+              props.onChangeWallet('walletconnect');
               props.onHide();
             }}
           >
