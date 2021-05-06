@@ -10,7 +10,6 @@ import ETH from "../assets/eth.svg";
 import DAL from "../assets/dal-cl.svg";
 import BNC from "../assets/bnc-cl.svg";
 import BTC from "../assets/btc-cl.svg";
-import Select from 'react-select';
 import { useAccordionToggle } from 'react-bootstrap/AccordionToggle';
 import AccordionContext from "react-bootstrap/AccordionContext";
 import UpArrow from "../assets/up-arrow.svg";
@@ -60,12 +59,10 @@ const FarmCard = (props) => {
     const [lPBalance, setLPBalance] = useState(null);
     const [selectedPool, setSelectedPool] = useState(null);
     const [depositAmount, setDepositAmount] = useState(0);
+    const [pendingDeposit, setPendingDeposit] = useState(false);
 
     const payr = usePayr();
-    let farmContract = null;
-    if (payr) {
-        farmContract = getFarmContract(payr);
-    }
+    const { account } = useWallet();
 
 	const farmIndex = farms.findIndex(
 		({ tokenSymbol }) => tokenSymbol === BASIC_TOKEN,
@@ -116,6 +113,7 @@ const FarmCard = (props) => {
     const clickDeposit = async (pool) => {
         setShowDeposit(true);
         setSelectedPool(pool);
+        setDepositAmount(0);
         const balance = await pool.lpContract.methods
             .balanceOf(props.account)
             .call();
@@ -190,11 +188,22 @@ const FarmCard = (props) => {
 						<div className="mt-3 d-flex text-center align-items-center">
 							<div className="px-2 w-50">
 								<Button 
-                                    disabled={lPBalance <= 0.00 || !depositAmount || parseFloat(depositAmount) >= lPBalance || parseFloat(depositAmount) <= 0.00}
+                                    disabled={lPBalance <= 0.00 || !depositAmount || parseFloat(depositAmount) >= lPBalance || parseFloat(depositAmount) <= 0.00 || pendingDeposit}
                                     className="w-100 font-weight-bold bg-white text_app_color rounded border-0 px-4"
-                                    // onClick={}
+                                    onClick={async () => {
+                                        setPendingDeposit(true);
+                                        const txHash = await stake(
+                                            getFarmContract(payr),
+                                            selectedPool.pid,
+                                            depositAmount,
+                                            account,
+                                        );
+                                        console.log(txHash);
+                                        setPendingDeposit(false);
+                                        setShowDeposit(false);
+                                    }}
                                 >
-                                    Deposit
+                                    {pendingDeposit ? 'Pending Deposit' : 'Deposit'}
                                 </Button>
 							</div>
 							<div className="px-2 w-50">
@@ -341,8 +350,7 @@ const PoolCard = (props) => {
                 pid,
                 account
             );
-            console.log("earned", earned);
-            setEarned(earned);
+            setEarned(bnToDec(new BigNumber(earned)).toFixed(2));
             const poolWeight = await getPoolWeight(
                 farmContract,
                 pid
@@ -354,13 +362,11 @@ const PoolCard = (props) => {
                 pid,
                 account
             );
-            console.log("staked", staked.toNumber());
-            setStaked(staked.toNumber());
+            setStaked(bnToDec(new BigNumber(staked.toNumber())).toFixed(2));
             const totalLpValue = await props.pool.lpContract.methods
                 .balanceOf(farmContract.options.address)
                 .call();
-            console.log("totalLpValue", totalLpValue);
-            setTotalLpValue(totalLpValue);
+            setTotalLpValue(bnToDec(new BigNumber(totalLpValue)).toFixed(2));
         }
         if (payr && account) {
             fetchEarned();
@@ -408,10 +414,10 @@ const PoolCard = (props) => {
             
                 <table className="w-100">
                     <tbody>
-                        <tr>
+                        {/* <tr>
                             <td><h5>APY</h5></td>
                             <td><h5 className="font-weight-bold text-right">{poolApy}</h5></td>
-                        </tr>
+                        </tr> */}
                         <tr>
                             <td><h5>WEIGHT</h5></td>
                             <td><h5 className="font-weight-bold text-right">{poolWeight}%</h5></td>
