@@ -3,7 +3,7 @@
 This project allows users to stake their LP tokens and receive PAYR as a reward(yield farming).
 
 
-## More About PayrLink 🎇
+## About PayrLink 🎇
 
 Secure Escrow Service and Private Solution powered by Blockchain Technology
 
