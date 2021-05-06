@@ -2,20 +2,23 @@
 
 This project allows users to stake their LP tokens and receive PAYR as a reward(yield farming).
 
-## More About PayrLink 🎈
+
+## More About PayrLink 🎇
 
 Secure Escrow Service and Private Solution powered by Blockchain Technology
 
-[WebSite](https://www.payrlink.com)
+[WebSite✨](https://www.payrlink.com)
 
-[Medium](https://medium.com/@payrlink_official)
+[Medium🎉](https://medium.com/@payrlink_official)
 
-[Telegram](https://t.me/payrlink)
+[Telegram🎊](https://t.me/payrlink)
+
 
 ## Environment Setup 🎈
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ### `npm install`
+
 
 ## Available Scripts 💻
 
