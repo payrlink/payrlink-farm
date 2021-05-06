@@ -10,6 +10,7 @@ import ConectWallet from "../components/conectWallet";
 import FarmCard from "../components/farmCard";
 import Light from "../assets/light.svg";
 import Dark from "../assets/dark.svg";
+import { formatAddress } from "../utils";
 
 const Farm = () => {
   const [modalShow, setModalShow] = useState(false);
@@ -103,7 +104,7 @@ const Farm = () => {
                   id="dropdown-basic"
                 >
                   <img alt="address" src={Wallet} className="mr-1" />
-                  {userAccount.slice(0, 10)}...
+                  {formatAddress(userAccount)}
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>

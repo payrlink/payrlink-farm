@@ -48,7 +48,7 @@ export const getFarms = (payr) => {
           tokenAddress,
           tokenSymbol,
           tokenContract,
-          earnToken: 'deor',
+          earnToken: 'PAYR',
           earnTokenAddress: payr.contracts.erc20.options.address,
           icon,
           pool,

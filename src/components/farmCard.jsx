@@ -1,7 +1,10 @@
 import React, { useContext, useState } from 'react';
 import { Row, Col, Button, Modal, Accordion, Form } from 'react-bootstrap';
+import BigNumber from 'bignumber.js'
 
 import useFarms from '../hooks/useFarms';
+import useAllStakedValue from '../hooks/useAllStakedValue';
+import usePayr from '../hooks/usePayr';
 
 import ETH from "../assets/eth.svg";
 import DAL from "../assets/dal-cl.svg";
@@ -14,69 +17,14 @@ import UpArrow from "../assets/up-arrow.svg";
 import DownArrow from "../assets/down-arrow.svg";
 import ConectWallet from "../components/conectWallet";
 
-const pools = [{
-    name: 'BNB-PAYR LP',
-    icon: ETH,
-    multiply: '4',
-    apr:'324.97',
-    stack:'BNB-PAYR LP',
-    earn:'PAYR',
-    depositFee:'0',
-    payrEarned: '0',
-    depost: 'BNB-PAYR LP',
-    totalValue:'5,581,349',
-    stakedValue:'0',
-    noFee: true
-},
-{
-    name: 'BNB-PAYR LP',
-    icon: ETH,
-    multiply: '4',
-    apr:'324.97',
-    stack:'BNB-PAYR LP',
-    earn:'PAYR',
-    depositFee:'0',
-    payrEarned: '0',
-    depost: 'BNB-PAYR LP',
-    totalValue:'5,581,349',
-    stakedValue:'0',
-    noFee: true
-},
-{
-    name: 'BNB-PAYR LP',
-    icon: ETH,
-    multiply: '4',
-    apr:'324.97',
-    stack:'BNB-PAYR LP',
-    earn:'PAYR',
-    depositFee:'0',
-    payrEarned: '0',
-    depost: 'BNB-PAYR LP',
-    totalValue:'5,581,349',
-    stakedValue:'0',
-    noFee: true
-},
-{
-    name: 'BNB-PAYR LP',
-    icon: ETH,
-    multiply: '4',
-    apr:'324.97',
-    stack:'BNB-PAYR LP',
-    earn:'PAYR',
-    depositFee:'0',
-    payrEarned: '0',
-    depost: 'BNB-PAYR LP',
-    totalValue:'5,581,349',
-    stakedValue:'0',
-    noFee: true
-}]
-
-const options = [
-    { value: '1', label: <div className="d-flex"><img alt="eth" src={ETH} height="20px" /><h6 className="pl-2 mb-0">ETH</h6></div> },
-    { value: '2', label: <div className="d-flex"><img alt="dai" src={DAL} height="20px" /><h6 className="pl-2 mb-0">DAL</h6></div> },
-    { value: '3', label: <div className="d-flex"><img alt="bnc" src={BNC} height="20px" /><h6 className="pl-2 mb-0">BNC</h6></div> },
-    { value: '4', label: <div className="d-flex"><img alt="btc" src={BTC} height="20px" /><h6 className="pl-2 mb-0">BTC</h6></div> },
-  ];
+import { BASIC_TOKEN } from '../constants/config';
+import { useWallet } from 'use-wallet';
+import { useEffect } from 'react';
+import { getEarned, getFarmContract, getPoolWeight, getStaked, stake } from '../contracts/utils';
+import { bnToDec } from '../utils';
+import useAllowance from '../hooks/useAllowance';
+import useApprove from '../hooks/useApprove';
+import { useCallback } from 'react';
 
 function ContextAwareToggle({ children, eventKey,theme, callback }) {
     const currentEventKey = useContext(AccordionContext);
@@ -93,8 +41,8 @@ function ContextAwareToggle({ children, eventKey,theme, callback }) {
         className="w-100 border-0 bg_transprent mt-3"
     >
         {isCurrentEventKey ? 
-			<h6 className={`font-weight-bold ${!theme && 'text-white'}`}>Hide<img alt="upArrow" src={UpArrow} className="ml-1" /></h6> : 
-			<h6 className={`font-weight-bold ${!theme && 'text-white'}`}>Detail<img alt="downArrow" src={DownArrow} className="ml-1" /></h6>
+			<h6 className={`font-weight-bold ${!theme && 'text-white'}`}><img alt="upArrow" src={UpArrow} className="ml-1" /></h6> : 
+			<h6 className={`font-weight-bold ${!theme && 'text-white'}`}><img alt="downArrow" src={DownArrow} className="ml-1" /></h6>
 		}
     </button>
     );
@@ -103,146 +51,103 @@ function ContextAwareToggle({ children, eventKey,theme, callback }) {
 const FarmCard = (props) => {
 
 	const [farms] = useFarms();
-	console.log(farms);
+	const stakedValue = useAllStakedValue();
 
     const [showDeposit, setShowDeposit] = useState(false);
     const [showHarvest, setShowHarvest] = useState(false);
     const [showWidhdraw, setShowWidhdraw ] = useState(false);
-    const [selectOption, setSelectOption] = useState(null);
     const [modalShow, setModalShow] = useState(false);
+    const [lPBalance, setLPBalance] = useState(null);
+    const [selectedPool, setSelectedPool] = useState(null);
+    const [depositAmount, setDepositAmount] = useState(0);
 
-    function  handleChange(selectedOption) {
-        setSelectOption(selectedOption);
-	};
-
-	const customStyles = {
-        menu: (provided, state) => ({
-			...provided,
-			background: props?.themeClass ? 'white' : '#333333',
-			color: state.selectProps.menuColor,
-        }),
-        
-        control: (provided) => ({
-            ...provided,
-            border: props?.themeClass ? '2px solid #141132' : '2px solid #403894' ,
-            background: 'transparent',
-        }),
-        container: (provided) => ({
-            ...provided,
-            // background: '#141132',
-            borderRadius: '20px',
-        }),
-        indicatorsContainer: () => ({
-            background: props?.themeClass ? '#141132' : '#403894',
-            borderRadius: '0 7px 7px 0',    
-        }),      
-        singleValue: (provided, state) => {        
-          const transition = 'opacity 300ms';
-          const color = props?.themeClass ? '' : 'white';
-          return { ...provided, transition, color };
-        }
+    const payr = usePayr();
+    let farmContract = null;
+    if (payr) {
+        farmContract = getFarmContract(payr);
     }
+
+	const farmIndex = farms.findIndex(
+		({ tokenSymbol }) => tokenSymbol === BASIC_TOKEN,
+	);
+	const farmPrice = farmIndex >= 0 && stakedValue[farmIndex]
+      ? stakedValue[farmIndex].tokenPriceInWeth
+      : new BigNumber(0);
+	
+	console.log("farms", farms);
+	console.log("stakedValue", stakedValue);
+	console.log("farmPrice", farmPrice);
+
+	const BLOCKS_PER_YEAR = new BigNumber(2336000);
+	// TODO: After block height xxxx, FARM_PER_BLOCK = 100;
+	const FARM_PER_BLOCK = new BigNumber(1000);
+
+	const rows = farms.reduce(
+		(farmRows, farm, i) => {
+            const farmWithStakedValue = {
+                ...farm,
+                ...stakedValue[i],
+                apy: stakedValue[i]
+                ? farmPrice
+                    .times(FARM_PER_BLOCK)
+                    .times(BLOCKS_PER_YEAR)
+                    .times(stakedValue[i].poolWeight)
+                    .div(stakedValue[i].totalWethValue)
+                : null,
+            };
+            const newFarmRows = [...farmRows];
+            if (newFarmRows[newFarmRows.length - 1].length === 3) {
+                newFarmRows.push([farmWithStakedValue]);
+            } else {
+                newFarmRows[newFarmRows.length - 1].push(farmWithStakedValue);
+            }
+            return newFarmRows;
+		},
+		[[]],
+	);
+
+	console.log("newFarms", rows);
+
+    const clickHarvest = (pool) => {
+        setShowHarvest(true);
+        setSelectedPool(pool);
+    };
+
+    const clickDeposit = async (pool) => {
+        setShowDeposit(true);
+        setSelectedPool(pool);
+        const balance = await pool.lpContract.methods
+            .balanceOf(props.account)
+            .call();
+        setLPBalance(bnToDec(new BigNumber(balance)));
+    };
+
+    const clickWithdraw = (pool) => {
+        setShowWidhdraw(true);
+        setSelectedPool(pool);
+    };
     
     return (
         <>
-        {pools.map((e, key) => ( 
-            <Col key={key} md="10" lg="6" xl="4" className="farm_card px-md-4 mb-5">
-                <div className="p-4 card_sec shadow border_radius">
-                    <div className="d-flex mb-4">
-                        <img alt="icon" src={e.icon} height="40" className="mr-3" />
-                        <div>
-                            <h5 className="mb-0 font-weight-bold">{e.name}</h5>
-                            <span className="badge badge-pill badge-primary">{e.multiply}x</span>
-                        </div>
+            {(rows[0].length > 0) ? (
+                rows.map((poolRow, i) => (
+                    <div key={i} md="10" lg="6" xl="4">
+                        {poolRow.map((pool, j) => (
+                            <PoolCard
+                                key={j}
+                                pool={pool}
+                                account={props.account}
+                                clickHarvest={clickHarvest}
+                                setModalShow={setModalShow}
+                                clickDeposit={clickDeposit}
+                                clickWithdraw={clickWithdraw}
+                            />
+                        ))}
                     </div>
-                
-                    <table className="w-100">
-                        <tbody>
-                            <tr>
-                                <td><h5>APR</h5></td>
-                                <td><h5 className="font-weight-bold text-right">{e.apr}%</h5></td>
-                            </tr>
-                            <tr>
-                                <td><h5>STAKE</h5></td>
-                                <td><h5 className="font-weight-bold text-right">{e.stack}</h5></td>
-                            </tr>
-                            <tr>
-                                <td><h5>EARN</h5></td>
-                                <td><h5 className="font-weight-bold text-right">{e.earn}</h5></td>
-                            </tr>
-                            <tr>
-                                <td><h5>DEPOSIT FEE</h5></td>
-                                <td><h5 className="font-weight-bold text-right">{e.depositFee}%</h5></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                
-                    <div className="bg_harvest border_radius p-3 font-weight-bold mb-4">
-                        <span className="text_app">PAYR EARNED</span>
-                        <div className="d-flex justify-content-between">
-                            <h3 className="text_app font-weight-bold">{e.payrEarned}</h3>
-                            <Button 
-								size="sm" 
-								className="py-1 px-3 shadow border-0 bg_app_dark h-100 rounded" 
-								onClick={() => setShowHarvest(true)}
-							>
-								<h6 className="mb-0">HARVEST</h6>
-							</Button>
-                        </div>
-                        <span className="text_app">{e.name}</span><span>{' '}STAKED</span>
-                    </div>
-                
-                    {props.account === null ?
-                        <Button 
-							className="font-weight-bold w-100 bg_app_dark rounded border-0" 
-							onClick={() => setModalShow(true)}
-						>
-							UNLOCK WALLET
-						</Button>
-                    :   <>
-                            <Button 
-								className="font-weight-bold w-100 bg_app_dark rounded border-0 mb-2" 
-								onClick={() => setShowDeposit(true)}
-							>
-								DEPOSIT
-							</Button>
-                            <Button 
-								variant="outline-primary" 
-								className="font-weight-bold w-100 rounded app_border" 
-								onClick={() => setShowWidhdraw(true)}
-							>
-								WITHDRAW
-							</Button>
-                        </>
-                    }
-                    
-                    <Accordion>
-                        <ContextAwareToggle eventKey="1" theme={props.themeClass} />
-
-                        <Accordion.Collapse eventKey="1">
-                            <div>
-                                <table className="w-100">
-                                    <tbody>
-                                        <tr>
-                                            <td><h5>DEPOSIT</h5></td>
-                                            <td><h5 className="font-weight-bold text-right">{e.depost}</h5></td>
-                                        </tr>
-                                        <tr>
-                                            <td><h5>TOTAL VALUE</h5></td>
-                                            <td><h5 className="font-weight-bold text-right">${e.totalValue}</h5></td>
-                                        </tr>
-                                        <tr>
-                                            <td><h5>MY STAKED VALUE</h5></td>
-                                            <td><h5 className="font-weight-bold text-right">${e.stakedValue}</h5></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </Accordion.Collapse>
-                    </Accordion>
-                </div>
-            </Col>
-            ))}
+                ))
+            ) : (
+                <div></div>
+            )}
 
             <ConectWallet 
 				show={modalShow} 
@@ -266,36 +171,31 @@ const FarmCard = (props) => {
 					<Row className="justify-content-between px-4">
 						<Col lg='5' className="custom_select text-center">
 						<h5 className="h_title">Pool</h5>
-							<Select
-								value={selectOption}
-								onChange={handleChange}
-								options={options}
-								isSearchable={false}
-								styles={customStyles}
-								theme={theme => ({
-									...theme,
-									borderRadius: 10
-									})}
-							/>
+                            <div className="d-flex form-control custom_input">
+                                <img alt="eth" src={ETH} height="20px" />
+                                <h6 className="pl-2 mb-0">{selectedPool ? selectedPool.name : ''}</h6>
+                            </div>
 						</Col>
 						<Col lg='7' className="custom_select text-center">
 							<h5 className="h_title">Amount</h5>
-							<Form.Control as="input" className="custom_imput text-right text-large" />
-							<h5 className="text-right h_title">Max: 7.247</h5>
+							<Form.Control as="input" type="number" className="custom_input text-right text-large" value={depositAmount} onChange={(val) => setDepositAmount(val.target.value)} />
+							<h5 className="text-right h_title">Max: {lPBalance ? lPBalance.toFixed(2) : "0.00"}</h5>
 						</Col>
 					</Row>
 					<div className="px-4 deposit_card py-3 mt-3">
 						<div className="d-flex justify-content-between mb-2">
-							<h5>Current Balance</h5>
-							<h5 className="font-weight-bold">4.85 ETH</h5>
-						</div>
-						<div className="d-flex justify-content-between">
-							<h5>Total Balance</h5>
-							<h5 className="font-weight-bold">8.08 ETH</h5>
+							<h5>Available Balance</h5>
+							<h5 className="font-weight-bold">{lPBalance ? lPBalance.toFixed(2) : "0.00"} {selectedPool ? selectedPool.name : ''}</h5>
 						</div>
 						<div className="mt-3 d-flex text-center align-items-center">
 							<div className="px-2 w-50">
-								<Button className="w-100 font-weight-bold bg-white text_app_color rounded border-0 px-4">Deposit</Button>
+								<Button 
+                                    disabled={lPBalance <= 0.00 || !depositAmount || parseFloat(depositAmount) >= lPBalance || parseFloat(depositAmount) <= 0.00}
+                                    className="w-100 font-weight-bold bg-white text_app_color rounded border-0 px-4"
+                                    // onClick={}
+                                >
+                                    Deposit
+                                </Button>
 							</div>
 							<div className="px-2 w-50">
 								<Button 
@@ -329,22 +229,14 @@ const FarmCard = (props) => {
 					<Row className="justify-content-between px-4">
 						<Col lg='5' className="custom_select text-center">
 						<h5 className="h_title">Pool</h5>
-							<Select
-								value={selectOption}
-								onChange={handleChange}
-								options={options}
-								isSearchable={false}
-								className="abcd"
-								styles={customStyles}
-								theme={theme => ({
-									...theme,
-									borderRadius: 10
-									})}
-							/>
+                            <div className="d-flex form-control custom_input">
+                                <img alt="eth" src={ETH} height="20px" />
+                                <h6 className="pl-2 mb-0">{selectedPool ? selectedPool.name : ''}</h6>
+                            </div>
 						</Col>
 						<Col lg='7' className="custom_select text-center">
 							<h5 className="h_title">Amount</h5>
-							<Form.Control as="input" className="custom_imput text-right text-large" />
+							<Form.Control as="input" className="custom_input text-right text-large" />
 							<h5 className="text-right h_title">Max: 7.247</h5>
 						</Col>
 					</Row>
@@ -392,22 +284,14 @@ const FarmCard = (props) => {
 					<Row className="justify-content-between px-4">
 						<Col lg='5' className="custom_select text-center">
 						<h5 className="h_title">Pool</h5>
-							<Select
-								value={selectOption}
-								onChange={handleChange}
-								options={options}
-								isSearchable={false}
-								className="abcd"
-								styles={customStyles}
-								theme={theme => ({
-									...theme,
-									borderRadius: 10
-									})}
-							/>
+                            <div className="d-flex form-control custom_input">
+                                <img alt="eth" src={ETH} height="20px" />
+                                <h6 className="pl-2 mb-0">{selectedPool ? selectedPool.name : ''}</h6>
+                            </div>
 						</Col>
 						<Col lg='7' className="custom_select text-center">
 							<h5 className="h_title">Amount</h5>
-							<Form.Control as="input" className="custom_imput text-right text-large" />
+							<Form.Control as="input" className="custom_input text-right text-large" />
 							<h5 className="text-right h_title">Max: 7.247</h5>
 						</Col>
 						<Col>
@@ -431,6 +315,203 @@ const FarmCard = (props) => {
             </Modal>
         </>
     );
+}
+
+const PoolCard = (props) => {
+
+    const [earned, setEarned] = useState(0);
+    const [poolWeight, setPoolWeight] = useState(0);
+    const [staked, setStaked] = useState(0);
+    const [totalLpValue, setTotalLpValue] = useState(0);
+    const [requestedApproval, setRequestedApproval] = useState(false);
+
+    const { account } = useWallet();
+    const { pid } = props.pool;
+    const payr = usePayr();
+    const allowance = useAllowance(props.pool.lpContract);
+    const { onApprove } = useApprove(props.pool.lpContract);
+
+    useEffect(() => {
+        async function fetchEarned() {
+            if (!payr) return;
+            console.log("fetchEarned");
+            const farmContract = getFarmContract(payr);
+            const earned = await getEarned(
+                farmContract,
+                pid,
+                account
+            );
+            console.log("earned", earned);
+            setEarned(earned);
+            const poolWeight = await getPoolWeight(
+                farmContract,
+                pid
+            );
+            console.log("poolWeight", poolWeight.toNumber());
+            setPoolWeight(poolWeight.toNumber() * 100);
+            const staked = await getStaked(
+                farmContract,
+                pid,
+                account
+            );
+            console.log("staked", staked.toNumber());
+            setStaked(staked.toNumber());
+            const totalLpValue = await props.pool.lpContract.methods
+                .balanceOf(farmContract.options.address)
+                .call();
+            console.log("totalLpValue", totalLpValue);
+            setTotalLpValue(totalLpValue);
+        }
+        if (payr && account) {
+            fetchEarned();
+        }
+    }, [payr, account, pid]);
+
+    let poolApy;
+    if (props.pool.apy && props.pool.apy.isNaN()) {
+        poolApy = '- %';
+    } else {
+        poolApy = props.pool.apy
+            ? `${props.pool.apy
+                .times(new BigNumber(100))
+                .toNumber()
+                .toLocaleString('en-US')
+                .slice(0, -1) || '-' }%`
+            : 'Loading ...';
+    }
+
+    console.log("poolApy", poolApy);
+
+    const handleApprove = useCallback(async () => {
+        try {
+            setRequestedApproval(true);
+            const txHash = await onApprove();
+            if (!txHash) {
+                setRequestedApproval(false);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }, [onApprove, setRequestedApproval]);
+
+    return (
+        <Col className="farm_card px-md-4 mb-5">
+            <div className="p-4 card_sec shadow border_radius">
+                <div className="d-flex mb-4">
+                    <img alt="icon" src={props.pool.icon ? props.pool.icon : ETH} height="40" className="mr-3" />
+                    <div>
+                        <h5 className="mb-0 font-weight-bold">{props.pool.name} POOL</h5>
+                        {/* <span className="badge badge-pill badge-primary">{props.pool.multiply}x</span> */}
+                        <span className="badge badge-pill badge-primary">{'EARN PAYR'}</span>
+                    </div>
+                </div>
+            
+                <table className="w-100">
+                    <tbody>
+                        <tr>
+                            <td><h5>APY</h5></td>
+                            <td><h5 className="font-weight-bold text-right">{poolApy}</h5></td>
+                        </tr>
+                        <tr>
+                            <td><h5>WEIGHT</h5></td>
+                            <td><h5 className="font-weight-bold text-right">{poolWeight}%</h5></td>
+                        </tr>
+                        <tr>
+                            <td><h5>STAKE</h5></td>
+                            <td><h5 className="font-weight-bold text-right">{props.pool.lpToken}</h5></td>
+                        </tr>
+                        <tr>
+                            <td><h5>EARN</h5></td>
+                            <td><h5 className="font-weight-bold text-right">{props.pool.earnToken}</h5></td>
+                        </tr>
+                    </tbody>
+                </table>
+            
+                <div className="bg_harvest border_radius p-3 font-weight-bold mb-4">
+                    <span className="text_app">PAYR EARNED</span>
+                    <div className="d-flex justify-content-between">
+                        <h3 className="text_app font-weight-bold">{earned}</h3>
+                        <Button 
+                            size="sm" 
+                            className="py-1 px-3 shadow border-0 bg_app_dark h-100 rounded" 
+                            onClick={() => props.clickHarvest(props.pool)}
+                        >
+                            <h6 className="mb-0">HARVEST</h6>
+                        </Button>
+                    </div>
+                    <span className="text_app">{props.pool.name} STAKED</span>
+                    <h3 className="text_app font-weight-bold">{staked}</h3>
+                </div>
+            
+                {props.account === null ?
+                    <Button 
+                        className="font-weight-bold w-100 bg_app_dark rounded border-0" 
+                        onClick={() => props.setModalShow(true)}
+                    >
+                        UNLOCK WALLET
+                    </Button>
+                :   <>
+                        {!allowance.toNumber() ? (
+                            <>
+                            {requestedApproval ? (
+                                <Button 
+                                    disabled={true}
+                                    className="font-weight-bold w-100 bg_app_dark rounded border-0 mb-2"
+                                >
+                                    Approving...
+                                </Button>    
+                            ) : (
+                                <Button 
+                                    className="font-weight-bold w-100 bg_app_dark rounded border-0 mb-2"
+                                    onClick={handleApprove}
+                                >
+                                    Approve {props.pool.name}
+                                </Button>
+                            )}
+                            </>
+                        ) : (
+                            <>
+                                <Button 
+                                    className="font-weight-bold w-100 bg_app_dark rounded border-0 mb-2" 
+                                    onClick={() => props.clickDeposit(props.pool)}
+                                >
+                                    DEPOSIT
+                                </Button>
+                                <Button 
+                                    variant="outline-primary" 
+                                    className="font-weight-bold w-100 rounded app_border" 
+                                    onClick={() => props.clickWithdraw(props.pool)}
+                                >
+                                    WITHDRAW
+                                </Button>
+                            </>
+                        )}                        
+                    </>
+                }
+                
+                <Accordion>
+                    <ContextAwareToggle eventKey="1" theme={props.themeClass} />
+
+                    <Accordion.Collapse eventKey="1">
+                        <div>
+                            <table className="w-100">
+                                <tbody>
+                                    <tr>
+                                        <td><h5>TOTAL VALUE</h5></td>
+                                        <td><h5 className="font-weight-bold text-right"><span className="text_app font-weight-bold">{totalLpValue}</span> {props.pool.name}</h5></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h5>MY STAKED</h5></td>
+                                        <td><h5 className="font-weight-bold text-right"><span className="text_app font-weight-bold">{staked}</span> {props.pool.name}</h5></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </Accordion.Collapse>
+                </Accordion>
+            </div>
+        </Col>
+    )
 }
 
 export default FarmCard;
