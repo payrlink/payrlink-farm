@@ -19,7 +19,7 @@ import ConectWallet from "../components/conectWallet";
 import { BASIC_TOKEN } from '../constants/config';
 import { useWallet } from 'use-wallet';
 import { useEffect } from 'react';
-import { getEarned, getFarmContract, getPoolWeight, getStaked, stake } from '../contracts/utils';
+import { getEarned, getFarmContract, getPoolWeight, getStaked, harvest, stake, unstake } from '../contracts/utils';
 import { bnToDec } from '../utils';
 import useAllowance from '../hooks/useAllowance';
 import useApprove from '../hooks/useApprove';
@@ -57,9 +57,14 @@ const FarmCard = (props) => {
     const [showWidhdraw, setShowWidhdraw ] = useState(false);
     const [modalShow, setModalShow] = useState(false);
     const [lPBalance, setLPBalance] = useState(null);
+    const [stakedBalance, setStakedBalance] = useState(null);
     const [selectedPool, setSelectedPool] = useState(null);
     const [depositAmount, setDepositAmount] = useState(0);
+    const [withdrawAmount, setWithdrawAmount] = useState(0);
     const [pendingDeposit, setPendingDeposit] = useState(false);
+    const [pendingWithdraw, setPendingWithdraw] = useState(false);
+    const [pendingHarvest, setPendingHarvest] = useState(false);
+    const [earnedBalance, setEarnedBalance] = useState(null);
 
     const payr = usePayr();
     const { account } = useWallet();
@@ -70,10 +75,6 @@ const FarmCard = (props) => {
 	const farmPrice = farmIndex >= 0 && stakedValue[farmIndex]
       ? stakedValue[farmIndex].tokenPriceInWeth
       : new BigNumber(0);
-	
-	console.log("farms", farms);
-	console.log("stakedValue", stakedValue);
-	console.log("farmPrice", farmPrice);
 
 	const BLOCKS_PER_YEAR = new BigNumber(2336000);
 	// TODO: After block height xxxx, FARM_PER_BLOCK = 100;
@@ -103,11 +104,15 @@ const FarmCard = (props) => {
 		[[]],
 	);
 
-	console.log("newFarms", rows);
-
-    const clickHarvest = (pool) => {
+    const clickHarvest = async (pool) => {
         setShowHarvest(true);
         setSelectedPool(pool);
+        const balance = await getEarned(
+            getFarmContract(payr),
+            pool.pid,
+            account
+        );
+        setEarnedBalance(bnToDec(new BigNumber(balance)));
     };
 
     const clickDeposit = async (pool) => {
@@ -120,9 +125,16 @@ const FarmCard = (props) => {
         setLPBalance(bnToDec(new BigNumber(balance)));
     };
 
-    const clickWithdraw = (pool) => {
+    const clickWithdraw = async (pool) => {
         setShowWidhdraw(true);
         setSelectedPool(pool);
+        setWithdrawAmount(0);
+        const balance = await getStaked(
+            getFarmContract(payr),
+            pool.pid,
+            account
+        );
+        setStakedBalance(bnToDec(new BigNumber(balance.toNumber())));
     };
     
     return (
@@ -188,19 +200,23 @@ const FarmCard = (props) => {
 						<div className="mt-3 d-flex text-center align-items-center">
 							<div className="px-2 w-50">
 								<Button 
-                                    disabled={lPBalance <= 0.00 || !depositAmount || parseFloat(depositAmount) >= lPBalance || parseFloat(depositAmount) <= 0.00 || pendingDeposit}
+                                    disabled={lPBalance <= 0.00 || !depositAmount || parseFloat(depositAmount) > lPBalance || parseFloat(depositAmount) <= 0.00 || pendingDeposit}
                                     className="w-100 font-weight-bold bg-white text_app_color rounded border-0 px-4"
                                     onClick={async () => {
                                         setPendingDeposit(true);
-                                        const txHash = await stake(
-                                            getFarmContract(payr),
-                                            selectedPool.pid,
-                                            depositAmount,
-                                            account,
-                                        );
-                                        console.log(txHash);
-                                        setPendingDeposit(false);
-                                        setShowDeposit(false);
+                                        try {
+                                            const txHash = await stake(
+                                                getFarmContract(payr),
+                                                selectedPool.pid,
+                                                depositAmount,
+                                                account,
+                                            );
+                                            setPendingDeposit(false);
+                                            setShowDeposit(false);
+                                        } catch (e) {
+                                            console.log(e);
+                                            setPendingDeposit(false);
+                                        }
                                     }}
                                 >
                                     {pendingDeposit ? 'Pending Deposit' : 'Deposit'}
@@ -245,22 +261,39 @@ const FarmCard = (props) => {
 						</Col>
 						<Col lg='7' className="custom_select text-center">
 							<h5 className="h_title">Amount</h5>
-							<Form.Control as="input" className="custom_input text-right text-large" />
-							<h5 className="text-right h_title">Max: 7.247</h5>
+							<Form.Control as="input" type="number" className="custom_input text-right text-large" value={withdrawAmount} onChange={(val) => setWithdrawAmount(val.target.value)} />
+							<h5 className="text-right h_title">Max: {stakedBalance ? stakedBalance.toFixed(2) : "0.00"}</h5>
 						</Col>
 					</Row>
                     <div className="px-4 deposit_card py-3 mt-3">
                         <div className="d-flex justify-content-between mb-2">
-                            <h5>Current Balance</h5>
-                            <h5 className="font-weight-bold">5.747 ETH</h5>
-                        </div>
-                        <div className="d-flex justify-content-between">
-                            <h5>Remaining Balance</h5>
-                            <h5 className="font-weight-bold">4.247 ETH</h5>
+                            <h5>Available Balance</h5>
+                            <h5 className="font-weight-bold">{stakedBalance ? stakedBalance.toFixed(2) : "0.00"} {selectedPool ? selectedPool.name : ''}</h5>
                         </div>
                         <div className="mt-3 d-flex text-center align-items-center">
                             <div className="px-2 w-50">
-                                <Button className="w-100 font-weight-bold bg-white text_app_color rounded border-0 px-4">Withdraw</Button>
+                                <Button 
+                                    disabled={stakedBalance <= 0.00 || !withdrawAmount || parseFloat(withdrawAmount) > stakedBalance || parseFloat(withdrawAmount) <= 0.00 || pendingWithdraw}
+                                    className="w-100 font-weight-bold bg-white text_app_color rounded border-0 px-4"
+                                    onClick={async () => {
+                                        setPendingWithdraw(true);
+                                        try {
+                                            const txHash = await unstake(
+                                                getFarmContract(payr),
+                                                selectedPool.pid,
+                                                withdrawAmount,
+                                                account,
+                                            );
+                                            setPendingWithdraw(false);
+                                            setShowWidhdraw(false);
+                                        } catch (e) {
+                                            console.log(e);
+                                            setPendingWithdraw(false);
+                                        }
+                                    }}
+                                >
+                                    {pendingWithdraw ? 'Pending Withdraw' : 'Withdraw'}
+                                </Button>
                             </div>
                             <div className="px-2 w-50">
                                 <Button 
@@ -291,6 +324,7 @@ const FarmCard = (props) => {
                 </Modal.Header>
                 <Modal.Body className="px-4">
 					<Row className="justify-content-between px-4">
+                        <Col lg='3.5'></Col>
 						<Col lg='5' className="custom_select text-center">
 						<h5 className="h_title">Pool</h5>
                             <div className="d-flex form-control custom_input">
@@ -298,21 +332,41 @@ const FarmCard = (props) => {
                                 <h6 className="pl-2 mb-0">{selectedPool ? selectedPool.name : ''}</h6>
                             </div>
 						</Col>
-						<Col lg='7' className="custom_select text-center">
-							<h5 className="h_title">Amount</h5>
-							<Form.Control as="input" className="custom_input text-right text-large" />
-							<h5 className="text-right h_title">Max: 7.247</h5>
-						</Col>
-						<Col>
+                        <Col lg='3.5'></Col>
+                        <div className="d-flex justify-content-between mb-2 px-4 harvest_card py-3 mt-3 w-100">
+                            <h5>Earned Amount</h5>
+                            <h5 className="font-weight-bold">{earnedBalance ? earnedBalance.toFixed(2) : "0.00"} {selectedPool ? selectedPool.earnToken : ''}</h5>
+                        </div>
+						<Col >
 							<div className="mt-3 d-flex text-center align-items-center">
 								<div className="px-2 w-50">
-									<Button className="w-100 font-weight-bold bg_app_dark text-white rounded border-0 px-4">Harvest</Button>
+									<Button 
+                                        disabled={pendingHarvest}
+                                        className="w-100 font-weight-bold bg_app_dark text-white rounded border-0 px-4"
+                                        onClick={async () => {
+                                            setPendingHarvest(true);
+                                            try {
+                                                const txHash = await harvest(
+                                                    getFarmContract(payr),
+                                                    selectedPool.pid,
+                                                    account,
+                                                );
+                                                setPendingHarvest(false);
+                                                setShowHarvest(false);
+                                            } catch (e) {
+                                                console.log(e);
+                                                setPendingHarvest(false);
+                                            }
+                                        }}
+                                    >
+                                        {pendingHarvest ? 'Pending Harvest' : 'Harvest'}
+                                    </Button>
 								</div>
 								<div className="px-2 w-50">
 									<Button 
 										variant="outline-primary" 
 										className="font-weight-bold rounded w-100 app_border h_title px-4" 
-										onClick={() => setShowHarvest(false)}
+                                        onClick={() => setShowHarvest(false)}
 									>
 										Cancel
 									</Button>
@@ -343,7 +397,6 @@ const PoolCard = (props) => {
     useEffect(() => {
         async function fetchEarned() {
             if (!payr) return;
-            console.log("fetchEarned");
             const farmContract = getFarmContract(payr);
             const earned = await getEarned(
                 farmContract,
@@ -355,7 +408,6 @@ const PoolCard = (props) => {
                 farmContract,
                 pid
             );
-            console.log("poolWeight", poolWeight.toNumber());
             setPoolWeight(poolWeight.toNumber() * 100);
             const staked = await getStaked(
                 farmContract,
@@ -371,6 +423,8 @@ const PoolCard = (props) => {
         if (payr && account) {
             fetchEarned();
         }
+        let refreshInterval = setInterval(fetchEarned, 10000)
+        return () => clearInterval(refreshInterval)
     }, [payr, account, pid]);
 
     let poolApy;
@@ -385,8 +439,6 @@ const PoolCard = (props) => {
                 .slice(0, -1) || '-' }%`
             : 'Loading ...';
     }
-
-    console.log("poolApy", poolApy);
 
     const handleApprove = useCallback(async () => {
         try {
