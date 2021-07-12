@@ -1,10 +1,10 @@
 export const contractAddresses = {
   erc20: {
-    42: '0x175D9b7BEf31cC753D1d94Ee70d90F23aBF94070',
+    42: '0x6587B4304Ab73e63F407C0D7AFB74334F6ff94B2',
     1: '0x0',
   },
   farm: {
-    42: '0x91B35B2f90f283A093e14B2d8578Afcd67C18876',
+    42: '0x2089b02D447692D36873b39514c627a56213B692',
     1: '0x0',
   },
   weth: {
@@ -17,11 +17,11 @@ export const supportedPools = [
   {
     pid: 0,
     lpAddresses: {
-      42: '0xf9f89F9dF418664cFAF5f8669d846269e49Ca6f1',
+      42: '0x4c20a74f95e41be819a5393b7e9544139813af36',
       1: '0x0',
     },
     tokenAddresses: {
-      42: '0x175D9b7BEf31cC753D1d94Ee70d90F23aBF94070',
+      42: '0x6587B4304Ab73e63F407C0D7AFB74334F6ff94B2',
       1: '0x0',
     },
     name: 'PAYR-ETH',
