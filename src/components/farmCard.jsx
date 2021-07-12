@@ -19,8 +19,8 @@ import ConectWallet from "../components/conectWallet";
 import { BASIC_TOKEN } from '../constants/config';
 import { useWallet } from 'use-wallet';
 import { useEffect } from 'react';
-import { getEarned, getFarmContract, getPoolWeight, getStaked, harvest, stake, unstake } from '../contracts/utils';
-import { bnToDec } from '../utils';
+import { getEarned, getFarmContract, getPoolWeight, getStaked, harvest, stake, unstake, getStakedTime } from '../contracts/utils';
+import { bnToDec, toFixed } from '../utils';
 import useAllowance from '../hooks/useAllowance';
 import useApprove from '../hooks/useApprove';
 import { useCallback } from 'react';
@@ -65,6 +65,7 @@ const FarmCard = (props) => {
     const [pendingWithdraw, setPendingWithdraw] = useState(false);
     const [pendingHarvest, setPendingHarvest] = useState(false);
     const [earnedBalance, setEarnedBalance] = useState(null);
+    const [stakedTime, setStakedTime] = useState(0);
 
     const payr = usePayr();
     const { account } = useWallet();
@@ -134,8 +135,18 @@ const FarmCard = (props) => {
             pool.pid,
             account
         );
+        const stakedTime = await getStakedTime(
+            getFarmContract(payr),
+            pool.pid,
+            account
+        );
+        setStakedTime(stakedTime * 1000);
         setStakedBalance(bnToDec(new BigNumber(balance.toNumber())));
     };
+
+    const currentDate = new Date();
+    const timestamp = currentDate.getTime();
+    console.log(timestamp);
     
     return (
         <>
@@ -189,13 +200,13 @@ const FarmCard = (props) => {
 						<Col lg='7' className="custom_select text-center">
 							<h5 className="h_title">Amount</h5>
 							<Form.Control as="input" type="number" className="custom_input text-right text-large" value={depositAmount} onChange={(val) => setDepositAmount(val.target.value)} />
-							<h5 className="text-right h_title">Max: {lPBalance ? lPBalance.toFixed(2) : "0.00"}</h5>
+							<h5 className="text-right h_title">Max: {lPBalance ? toFixed(lPBalance, true, 4) : "0.0000"}</h5>
 						</Col>
 					</Row>
 					<div className="px-4 deposit_card py-3 mt-3">
 						<div className="d-flex justify-content-between mb-2">
 							<h5>Available Balance</h5>
-							<h5 className="font-weight-bold">{lPBalance ? lPBalance.toFixed(2) : "0.00"} {selectedPool ? selectedPool.name : ''}</h5>
+							<h5 className="font-weight-bold">{lPBalance ? toFixed(lPBalance, true ,4) : "0.0000"} {selectedPool ? selectedPool.name : ''}</h5>
 						</div>
 						<div className="mt-3 d-flex text-center align-items-center">
 							<div className="px-2 w-50">
@@ -262,18 +273,23 @@ const FarmCard = (props) => {
 						<Col lg='7' className="custom_select text-center">
 							<h5 className="h_title">Amount</h5>
 							<Form.Control as="input" type="number" className="custom_input text-right text-large" value={withdrawAmount} onChange={(val) => setWithdrawAmount(val.target.value)} />
-							<h5 className="text-right h_title">Max: {stakedBalance ? stakedBalance.toFixed(2) : "0.00"}</h5>
+							<h5 className="text-right h_title">Max: {stakedBalance ? toFixed(stakedBalance, true ,4) : "0.0000"}</h5>
 						</Col>
 					</Row>
                     <div className="px-4 deposit_card py-3 mt-3">
                         <div className="d-flex justify-content-between mb-2">
                             <h5>Available Balance</h5>
-                            <h5 className="font-weight-bold">{stakedBalance ? stakedBalance.toFixed(2) : "0.00"} {selectedPool ? selectedPool.name : ''}</h5>
+                            <h5 className="font-weight-bold">{stakedBalance ? toFixed(stakedBalance, true ,4) : "0.0000"} {selectedPool ? selectedPool.name : ''}</h5>
                         </div>
+                        {(timestamp - stakedTime) < 7776000000 && (
+                            <div className="d-flex justify-content-between mb-2 error_text">
+                                <h6>You can withdraw the staked LPs after 90 days from the last deposit!</h6>
+                            </div>
+                        )}                        
                         <div className="mt-3 d-flex text-center align-items-center">
                             <div className="px-2 w-50">
                                 <Button 
-                                    disabled={stakedBalance <= 0.00 || !withdrawAmount || parseFloat(withdrawAmount) > stakedBalance || parseFloat(withdrawAmount) <= 0.00 || pendingWithdraw}
+                                    disabled={(timestamp - stakedTime) < 7776000000 || stakedBalance <= 0.00 || !withdrawAmount || parseFloat(withdrawAmount) > stakedBalance || parseFloat(withdrawAmount) <= 0.00 || pendingWithdraw}
                                     className="w-100 font-weight-bold bg-white text_app_color rounded border-0 px-4"
                                     onClick={async () => {
                                         setPendingWithdraw(true);
@@ -335,7 +351,7 @@ const FarmCard = (props) => {
                         <Col lg='3.5'></Col>
                         <div className="d-flex justify-content-between mb-2 px-4 harvest_card py-3 mt-3 w-100">
                             <h5>Earned Amount</h5>
-                            <h5 className="font-weight-bold">{earnedBalance ? earnedBalance.toFixed(2) : "0.00"} {selectedPool ? selectedPool.earnToken : ''}</h5>
+                            <h5 className="font-weight-bold">{earnedBalance ? toFixed(earnedBalance, true, 4) : "0.0000"} {selectedPool ? selectedPool.earnToken : ''}</h5>
                         </div>
 						<Col >
 							<div className="mt-3 d-flex text-center align-items-center">
@@ -386,6 +402,7 @@ const PoolCard = (props) => {
     const [poolWeight, setPoolWeight] = useState(0);
     const [staked, setStaked] = useState(0);
     const [totalLpValue, setTotalLpValue] = useState(0);
+    const [stakedTime, setStakedTime] = useState(0);
     const [requestedApproval, setRequestedApproval] = useState(false);
 
     const { account } = useWallet();
@@ -403,7 +420,7 @@ const PoolCard = (props) => {
                 pid,
                 account
             );
-            setEarned(bnToDec(new BigNumber(earned)).toFixed(2));
+            setEarned(toFixed(bnToDec(new BigNumber(earned)), true, 4));
             const poolWeight = await getPoolWeight(
                 farmContract,
                 pid
@@ -414,11 +431,17 @@ const PoolCard = (props) => {
                 pid,
                 account
             );
-            setStaked(bnToDec(new BigNumber(staked.toNumber())).toFixed(2));
+            setStaked(toFixed(bnToDec(new BigNumber(staked.toNumber())), true, 4));
+            const stakedTime = await getStakedTime(
+                farmContract,
+                pid,
+                account
+            );
+            setStakedTime(stakedTime * 1000);
             const totalLpValue = await props.pool.lpContract.methods
                 .balanceOf(farmContract.options.address)
                 .call();
-            setTotalLpValue(bnToDec(new BigNumber(totalLpValue)).toFixed(2));
+            setTotalLpValue(toFixed(bnToDec(new BigNumber(totalLpValue)), true, 4));
         }
         if (payr && account) {
             fetchEarned();
@@ -452,6 +475,7 @@ const PoolCard = (props) => {
         }
     }, [onApprove, setRequestedApproval]);
 
+    const stakedTimeFormat = stakedTime ? new Date(stakedTime).toLocaleString() : 'NaN';
     return (
         <Col className="farm_card px-md-4 mb-5">
             <div className="p-4 card_sec shadow border_radius">
@@ -492,6 +516,7 @@ const PoolCard = (props) => {
                         <Button 
                             size="sm" 
                             className="py-1 px-3 shadow border-0 bg_app_dark h-100 rounded" 
+                            disabled={staked <= 0}
                             onClick={() => props.clickHarvest(props.pool)}
                         >
                             <h6 className="mb-0">HARVEST</h6>
@@ -499,6 +524,8 @@ const PoolCard = (props) => {
                     </div>
                     <span className="text_app">{props.pool.name} STAKED</span>
                     <h3 className="text_app font-weight-bold">{staked}</h3>
+                    <span className="text_app">LAST STAKED TIME</span>
+                    <h3 className="text_app font-weight-bold">{stakedTimeFormat}</h3>
                 </div>
             
                 {props.account === null ?

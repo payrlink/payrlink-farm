@@ -172,6 +172,17 @@ export const getStaked = async (farmContract, pid, account) => {
   }
 }
 
+export const getStakedTime = async (farmContract, pid, account) => {
+  try {
+    const { timestamp } = await farmContract.methods
+      .userInfo(pid, account)
+      .call();
+    return timestamp;
+  } catch {
+    return 0;
+  }
+}
+
 export const redeem = async (farmContract, account) => {
   let now = new Date().getTime() / 1000;
   if (now >= 1597172400) {
